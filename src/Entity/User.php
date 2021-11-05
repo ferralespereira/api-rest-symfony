@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Users
@@ -62,6 +64,18 @@ class User
      * @ORM\Column(name="created_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
      */
     private $createdAt = 'CURRENT_TIMESTAMP';
+
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Video", mappedBy="user")
+     */
+
+    private $videos;
+
+    public function __construct(){
+        $this->videos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -140,5 +154,11 @@ class User
         return $this;
     }
 
+    /**
+     * @return Colletion|video[]
+     */
+    public function getVideos():Collection{
+        return $this->videos;
+    }
 
 }
