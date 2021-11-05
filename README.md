@@ -57,3 +57,4 @@ This is an Api Rest for a video web site enviroment. Development wiht Symfony ph
 * To remove any package: `composer remove package-name`
 * To install symfony by composer.json file: `composer update "symfony/*"`
 * To create Entities(this are like Data Base models): `php bin/console doctrine:mapping:import App\Entity annotation --path=src/Entity`
+* To create Entity methods: `php bin/console make:entity --regenerate`
