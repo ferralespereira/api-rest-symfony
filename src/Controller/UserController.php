@@ -194,21 +194,55 @@ class UserController extends AbstractController
 
     public function login(Request $request){
         // Recibir lod datos por post
+        $json = $request->get('json', null);
 
-        // Tener array por defecto
-        $data = [
-            'status' => 'success',
-            'code'   => 200,
-            'message'=> 'ojo'
-        ];
+        // Decodificar el json
+        $params = json_decode($json);
 
-        // Comprobar y validar datos
+        if($json != null){
+            // Comprobar y validar datos
+            $email    = (isset($params->email) && $params->email) ? $params->email : null;
+            $password = (isset($params->password) && $params->password) ? $params->password : null;
+            $gettoken = (isset($params->gettoken) && $params->gettoken) ? $params->gettoken : null;
 
-        // Cifrar la contrasena
+            // valido q el email sea de tipo email
+            $validator       = Validation::createValidator();
+            $validator_email = $validator->validate($email, [
+                new Email()
+            ]);
 
-        // Si todo eso es valido llamaremos a un servicio para identificar al usuario y q nos devuelva un token o un objeto
+            if($email && $password && count($validator_email) == 0 ){
+                // Cifrar la contrasena
+                $pwd = hash('sha256', $password);
 
-        // Si nos devulve bien los datos, daremos respuesta
+                // Si todo eso es valido llamaremos a un servicio para identificar al usuario y q nos devuelva un token o un objeto
+
+                // Crear servicio jwt
+
+                // Si nos devuelve bien los datos, daremos respuesta
+                $data = [
+                    'status' => 'success',
+                    'code'   => 200,
+                    'message'=> 'validation correct.'
+                ];
+
+            }else{
+                $data = [
+                    'status' => 'error',
+                    'code'   => 200,
+                    'message'=> 'Some data is missing.'
+                ];
+            }
+
+
+        }else{
+            $data = [
+                'status' => 'success',
+                'code'   => 200,
+                'message'=> 'All data is missing.'
+            ];
+
+        }
 
 
         return new JsonResponse($data);
