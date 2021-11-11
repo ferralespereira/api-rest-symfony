@@ -139,13 +139,34 @@ class UserController extends AbstractController
                 $pwd = hash('sha256', $password);
                 $user->setPassword($pwd);
 
+                // Comprobar si el usuario existe
+                $doctrine = $this->getDoctrine();
+                $em = $doctrine->getManager();
 
-                $data = [
-                    'status' => 'success',
-                    'code'   => 200,
-                    'message'=> 'El usuario se ha creado',
-                    'user'   => $user
-                ];    
+                $user_repo = $doctrine->getRepository(User::class);
+                $isset_user = $user_repo->findBy(array(
+                    'email' => $email
+                ));
+
+                if(count($isset_user) == 0){
+                    // Si no existe guardarlo en la base de datos
+                    $em->persist($user);
+                    $em->flush();
+
+                    $data = [
+                        'status' => 'success',
+                        'code'   => 200,
+                        'message'=> 'El usuario se ha creado',
+                        'user'   => $user
+                    ];    
+                }else{
+                    $data = [
+                        'status' => 'error',
+                        'code'   => 200,
+                        'message'=> 'El usuario existe'
+                    ];
+                }
+
             }else{
                 $data = [
                     'status' => 'error',
@@ -164,10 +185,7 @@ class UserController extends AbstractController
 
 
 
-        // Comprobar si el usuario existe
-
-        // Si no existe guardarlo en la base de datos
-
+        
         // Hacer respuesta en json
         // return $this->resjson($data);
         // return $this->json($data);
