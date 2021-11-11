@@ -191,4 +191,27 @@ class UserController extends AbstractController
         // return $this->json($data);
         return new JsonResponse($data);
     }
+
+    public function login(Request $request){
+        // Recibir lod datos por post
+
+        // Tener array por defecto
+        $data = [
+            'status' => 'success',
+            'code'   => 200,
+            'message'=> 'ojo'
+        ];
+
+        // Comprobar y validar datos
+
+        // Cifrar la contrasena
+
+        // Si todo eso es valido llamaremos a un servicio para identificar al usuario y q nos devuelva un token o un objeto
+
+        // Si nos devulve bien los datos, daremos respuesta
+
+
+        return new JsonResponse($data);
+
+    }
 }
