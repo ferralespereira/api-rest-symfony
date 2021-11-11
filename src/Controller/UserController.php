@@ -80,20 +80,25 @@ class UserController extends AbstractController
         // Comprobar y validar datos
         $vaidator_error = array();
         if($json != null){
-            $name    = (ctype_alpha($params->name)) ? $params->name : array_push($vaidator_error, $vaidator_error['name']='Name error');
+
+            $name    = (isset($params->name) && ctype_alpha($params->name)) ? $params->name : array_push($vaidator_error, $vaidator_error['name']='Name error');
             
             $surname = (isset($params->surname) && ctype_alpha($params->surname)) ? $params->surname : array_push($vaidator_error, $vaidator_error['surname']='Surname error');
             
-            $email   = (!empty($params->email)) ? $params->email : null;
+            if(isset($params->email)){
+                $validator = Validation::createValidator();
+                $validate_email = $validator->validate($params->email, [
+                    new Email()
+                ]);
+
+                $email   = ($params->email && count($validate_email) == 0) ? $params->email : array_push($vaidator_error, $vaidator_error['email']='email error');
+            }else{
+                $email   = array_push($vaidator_error, $vaidator_error['email']='write email');
+            }
             
-            $pasword = (!empty($params->pasword)) ? $params->pasword : null;
+            $pasword = (isset($params->pasword)) ? $params->pasword : array_push($vaidator_error, $vaidator_error['pasword']='pasword error');
 
-            $validator = Validation::createValidator();
-            $validate_email = $validator->validate($email, [
-                new Email()
-            ]); 
-
-            if($email && count($validate_email) == 0 && $pasword && $name && $surname && $pasword){
+            if(count($vaidator_error) == 0){
                 $data = [
                     'status' => 'success',
                     'code'   => 200,
