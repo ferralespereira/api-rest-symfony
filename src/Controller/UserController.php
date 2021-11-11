@@ -127,10 +127,24 @@ class UserController extends AbstractController
             }
 
             if(count($vaidator_error) == 0){
+                // Si la validacion es correcta, crear el objeto del usuario
+                $user = new User();
+                $user->setName($name);
+                $user->setSurname($surname);
+                $user->setEmail($email);
+                $user->setRole('ROLE_USER');
+                $user->setCreatedAt(new \Datetime('now'));
+
+                // Cifrar la contrasena
+                $pwd = hash('sha256', $password);
+                $user->setPassword($pwd);
+
+
                 $data = [
                     'status' => 'success',
                     'code'   => 200,
-                    'message'=> 'El usuario se ha creado'
+                    'message'=> 'El usuario se ha creado',
+                    'user'   => $user
                 ];    
             }else{
                 $data = [
@@ -148,9 +162,7 @@ class UserController extends AbstractController
             ];
         }
 
-        // Si la validacion es correcta, crear el objeto del usuario
 
-        // Cifrar la contrasena
 
         // Comprobar si el usuario existe
 
