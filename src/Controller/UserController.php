@@ -182,9 +182,6 @@ class UserController extends AbstractController
                 'message'=> 'Envie los datos'
             ];
         }
-
-
-
         
         // Hacer respuesta en json
         // return $this->resjson($data);
