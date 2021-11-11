@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Constraints\Email;
 use App\Entity\User;
 use App\Entity\Video;
 
@@ -32,8 +34,7 @@ class UserController extends AbstractController
 
     }
 
-    public function index(): Response
-    {
+    public function index(): Response{
 
         $user_repo = $this->getDoctrine()->getRepository(User::Class);
         $video_repo = $this->getDoctrine()->getRepository(Video::Class);
@@ -73,20 +74,46 @@ class UserController extends AbstractController
 
         // Decodificar el json
         $params = json_decode($json);
-        // var_dump($params);
-        // die();
 
         // Hacer una respuesta por defecto
-        $data = [
-            'status' => 'error',
-            'code'   => 200,
-            'message'=> 'El usuario nos se ha creado',
-            'params' => $params,
-            'json' => $json
-        ];
-        // 'json'   => $json,
-
+        
         // Comprobar y validar datos
+        $vaidator_error = array();
+        if($json != null){
+            $name    = (ctype_alpha($params->name)) ? $params->name : array_push($vaidator_error, $vaidator_error['name']='Name error');
+            
+            $surname = (isset($params->surname) && ctype_alpha($params->surname)) ? $params->surname : array_push($vaidator_error, $vaidator_error['surname']='Surname error');
+            
+            $email   = (!empty($params->email)) ? $params->email : null;
+            
+            $pasword = (!empty($params->pasword)) ? $params->pasword : null;
+
+            $validator = Validation::createValidator();
+            $validate_email = $validator->validate($email, [
+                new Email()
+            ]); 
+
+            if($email && count($validate_email) == 0 && $pasword && $name && $surname && $pasword){
+                $data = [
+                    'status' => 'success',
+                    'code'   => 200,
+                    'message'=> 'El usuario se ha creado'
+                ];    
+            }else{
+                $data = [
+                    'status' => 'error',
+                    'code'   => 200,
+                    'message'=> 'Validation error',
+                    'vaidator_error' => $vaidator_error
+                ];
+            }
+        }else{
+            $data = [
+                'status' => 'error',
+                'code'   => 200,
+                'message'=> 'Envie los datos'
+            ];
+        }
 
         // Si la validacion es correcta, crear el objeto del usuario
 
