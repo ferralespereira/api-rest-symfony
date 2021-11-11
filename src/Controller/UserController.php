@@ -81,22 +81,50 @@ class UserController extends AbstractController
         $vaidator_error = array();
         if($json != null){
 
-            $name    = (isset($params->name) && ctype_alpha($params->name)) ? $params->name : array_push($vaidator_error, $vaidator_error['name']='Name error');
-            
-            $surname = (isset($params->surname) && ctype_alpha($params->surname)) ? $params->surname : array_push($vaidator_error, $vaidator_error['surname']='Surname error');
-            
+            if(isset($params->name) && ctype_alpha($params->name)){
+                $name = $params->name;
+            }else{
+                $vaidator_error['name']='Name error';    
+            }
+
+            if(isset($params->surname) && ctype_alpha($params->surname)){
+                $surname = $params->surname;
+            }else{
+                $vaidator_error['surname']='Surname error';    
+            }
+
             if(isset($params->email)){
                 $validator = Validation::createValidator();
                 $validate_email = $validator->validate($params->email, [
                     new Email()
                 ]);
 
-                $email   = ($params->email && count($validate_email) == 0) ? $params->email : array_push($vaidator_error, $vaidator_error['email']='email error');
+                if($params->email && count($validate_email) == 0){
+                    $email = $params->email;
+                }else{
+                    $vaidator_error['email']='email error';
+                }
             }else{
-                $email   = array_push($vaidator_error, $vaidator_error['email']='write email');
+                $vaidator_error['email']='write email';
             }
             
-            $pasword = (isset($params->pasword)) ? $params->pasword : array_push($vaidator_error, $vaidator_error['pasword']='pasword error');
+            if(isset($params->password)){
+                // Given password
+                $password = $params->password;
+    
+                // Validate password strength
+                $uppercase = preg_match('@[A-Z]@', $password);
+                $lowercase = preg_match('@[a-z]@', $password);
+                $number    = preg_match('@[0-9]@', $password);
+                $specialChars = preg_match('@[^\w]@', $password);
+
+                if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+                    $vaidator_error['password']='Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
+                }
+
+            }else{
+                $vaidator_error['password']='write password';
+            }
 
             if(count($vaidator_error) == 0){
                 $data = [
