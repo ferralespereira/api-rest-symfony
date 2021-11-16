@@ -227,7 +227,7 @@ class UserController extends AbstractController
                 $data = [
                     'status' => 'error',
                     'code'   => 200,
-                    'message'=> 'Some data is missing.'
+                    'message'=> 'Some data is missing or wrong.'
                 ];
             }
 
