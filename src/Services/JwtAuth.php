@@ -37,9 +37,9 @@ class JwtAuth{
             
             // devuelvo el token decodificado o codificado
             if($gettoken){
-                $data = $token;
-            }else{
                 $data = JWT::encode($token, $this->key, 'HS256');
+            }else{
+                $data = $token;
             }
 
         }else{
