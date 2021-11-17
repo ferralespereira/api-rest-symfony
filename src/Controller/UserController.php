@@ -196,7 +196,7 @@ class UserController extends AbstractController
         // Decodificar el json
         $params = json_decode($json);
 
-        if($json != null){
+        if($json){
             // Comprobar y validar datos
             $email    = (isset($params->email) && $params->email) ? $params->email : null;
             $password = (isset($params->password) && $params->password) ? $params->password : null;
@@ -207,35 +207,20 @@ class UserController extends AbstractController
             $validator_email = $validator->validate($email, [
                 new Email()
             ]);
-
+            
             if($email && $password && count($validator_email) == 0 ){
                 // Cifrar la contrasena
                 $pwd = hash('sha256', $password);
 
-                // Si todo eso es valido llamaremos a un servicio para identificar al usuario y q nos devuelva un token o un objeto
-
-                // Crear servicio jwt
-                $jwt_auth->signup();
-
-
-
-                // Si nos devuelve bien los datos, daremos respuesta
-                $data = [
-                    'status'             => 'success',
-                    'code'               => 200,
-                    'message'            => 'validation correct.',
-                    'jwt_auth->signup()' => $jwt_auth->signup()
-                ];
+                $data = $jwt_auth->signup($email, $pwd, $gettoken);
 
             }else{
                 $data = [
                     'status' => 'error',
                     'code'   => 200,
-                    'message'=> 'Some data is missing or wrong.'
+                    'message'=> 'Validation error'    
                 ];
             }
-
-
         }else{
             $data = [
                 'status' => 'success',
@@ -245,8 +230,6 @@ class UserController extends AbstractController
 
         }
 
-
         return new JsonResponse($data);
-
     }
 }
