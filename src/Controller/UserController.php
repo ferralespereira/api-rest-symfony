@@ -232,4 +232,23 @@ class UserController extends AbstractController
 
         return new JsonResponse($data);
     }
+
+    public function edit(Request $request){
+        // recoger la cabecera de autenticacion
+
+        // crear un metodo para comprobar si el token es correcto 
+        
+        // si es correcto hacer la actualizacion del usuario
+
+        //...
+
+        $data = [
+            'status' => 'error',
+            'message'=> 'metodo update del controlador usuario'
+        ];
+
+        return $this->resjson($data);
+
+        
+    }
 }
