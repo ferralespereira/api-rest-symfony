@@ -233,23 +233,68 @@ class UserController extends AbstractController
         return new JsonResponse($data);
     }
 
-    public function edit(Request $request){
+    public function edit(Request $request, JwtAuth $jwt_auth){
         // recoger la cabecera de autenticacion
         $token = $request->headers->get('Authorization');
 
         // crear un metodo para comprobar si el token es correcto 
+        $authCheck = $jwt_auth->checkToken($token);
         
         // si es correcto hacer la actualizacion del usuario
+        if($authCheck){
+            // actualizo el usuario
 
-        //...
+            // conseguir el entity manager
+            $em = $this->getDoctrine()->getManager();
 
-        $data = [
-            'status' => 'error',
-            'message'=> 'metodo update del controlador usuario',
-            'token'  => $token
-        ];
+            // conseguir los datos del usuario identificado
+            $identity = $jwt_auth->checkToken($token, true);
 
-        return $this->resjson($data);
+            // conseguir el usuario a actualizar
+            $user_repo = $this->getDoctrine()->getRepository(User::class);
+            $uset = $user_repo->findOneBy([
+                'id' => $identity->sub
+            ]);
+
+            // comprobar y validar los datos
+            $json = $request->get('json', null);
+            $params = json_decode($json);
+
+            if($params){
+                // OJO AQUI ME QUEDE
+
+                // comprobar los datos duplicados
+
+                // asignar nuevos datos al objeto del usuario
+    
+    
+                // Guardar cambios en la base de datos
+    
+                $data = [
+                    'status' => 'success',
+                    'message'=> 'Usuario actualizado',
+                    'token'  => $token,
+                    'identity'=> $identity
+                ];
+            }else{
+                $data = [
+                    'status' => 'error',
+                    'message'=> 'Envie los datos a actualizar'
+                ];    
+            }
+
+
+        }else{
+            $data = [
+                'status' => 'error',
+                'message'=> 'Token incorrect'
+            ];
+        }
+
+
+        // return $this->resjson($data);
+        return new JsonResponse($data);
+
 
         
     }
