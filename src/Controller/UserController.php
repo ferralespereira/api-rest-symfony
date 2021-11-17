@@ -235,6 +235,7 @@ class UserController extends AbstractController
 
     public function edit(Request $request){
         // recoger la cabecera de autenticacion
+        $token = $request->headers->get('Authorization');
 
         // crear un metodo para comprobar si el token es correcto 
         
@@ -244,7 +245,8 @@ class UserController extends AbstractController
 
         $data = [
             'status' => 'error',
-            'message'=> 'metodo update del controlador usuario'
+            'message'=> 'metodo update del controlador usuario',
+            'token'  => $token
         ];
 
         return $this->resjson($data);
