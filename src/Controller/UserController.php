@@ -240,9 +240,8 @@ class UserController extends AbstractController
         // crear un metodo para comprobar si el token es correcto 
         $authCheck = $jwt_auth->checkToken($token);
         
-        // si es correcto hacer la actualizacion del usuario
+        // si el token es correcto
         if($authCheck){
-            // actualizo el usuario
 
             // conseguir el entity manager
             $em = $this->getDoctrine()->getManager();
@@ -250,32 +249,150 @@ class UserController extends AbstractController
             // conseguir los datos del usuario identificado
             $identity = $jwt_auth->checkToken($token, true);
 
-            // conseguir el usuario a actualizar
-            $user_repo = $this->getDoctrine()->getRepository(User::class);
-            $uset = $user_repo->findOneBy([
-                'id' => $identity->sub
-            ]);
-
             // comprobar y validar los datos
             $json = $request->get('json', null);
             $params = json_decode($json);
 
+            $vaidator_error = array();  
             if($params){
-                // OJO AQUI ME QUEDE
+                
+                //*--valido los datos------ini
+                if(isset($params->name) && ctype_alpha($params->name)){
+                    $name = $params->name;
+                }else{
+                    $vaidator_error['name']='Name error';    
+                }
+    
+                if(isset($params->surname) && ctype_alpha($params->surname)){
+                    $surname = $params->surname;
+                }else{
+                    $vaidator_error['surname']='Surname error';    
+                }
+    
+                if(isset($params->email) && $params->email){
+                    $validator = Validation::createValidator();
+                    $validate_email = $validator->validate($params->email, [
+                        new Email()
+                    ]);
+    
+                    if(count($validate_email) == 0){
+                        $email = $params->email;
+                    }else{
+                        $vaidator_error['email']='Email error';
+                    }
+                }else{
+                    $vaidator_error['email']='write email';
+                }
+                
+                if(isset($params->password)){
+                    // Given password
+                    $password = $params->password;
+        
+                    // Validate password strength
+                    $uppercase = preg_match('@[A-Z]@', $password);
+                    $lowercase = preg_match('@[a-z]@', $password);
+                    $number    = preg_match('@[0-9]@', $password);
+                    $specialChars = preg_match('@[^\w]@', $password);
+    
+                    if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+                        $vaidator_error['password']='Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
+                    }
+    
+                }else{
+                    $vaidator_error['password']='write password';
+                }
 
-                // comprobar los datos duplicados
+                if(isset($params->password_confirmation)){
+                    if($params->password_confirmation != $params->password){
+                        $vaidator_error['password']='The password and password confirmation must be match';
+                    }
+                }else{
+                    $vaidator_error['password']='Send password confirmation';
+                }
 
-                // asignar nuevos datos al objeto del usuario
-    
-    
-                // Guardar cambios en la base de datos
-    
-                $data = [
-                    'status' => 'success',
-                    'message'=> 'Usuario actualizado',
-                    'token'  => $token,
-                    'identity'=> $identity
-                ];
+                //*--valido los datos------end
+                
+                // si pasa la validacion
+                if(count($vaidator_error) == 0){
+
+                    // compruebo q el si va a cambiar el email no exista otro usuario con el mismo email
+                    if($identity->email != $email){
+                        
+                        $user_repo = $this->getDoctrine()->getRepository(User::class);
+                        $user = $user_repo->findOneBy([
+                            'email' => $email
+                        ]);
+
+                        if($user){
+                            $data = [
+                                'status' => 'error',
+                                'message'=> 'There is another user within the same email'
+                            ];
+                        }else{
+
+                            // actualizo los datos del usuario y devuelvo el usuario actualizado y su nuevo token
+                            $user_repo = $this->getDoctrine()->getRepository(User::class);
+                            $user = $user_repo->findOneBy([
+                                'id' => $identity->sub
+                            ]);
+
+                            $user->setName($email);
+                            $user->setSurname($email);
+                            $user->setEmail($email);
+
+                            // Cifrar la contrasena
+                            $pwd = hash('sha256', $password);
+                            $user->setPassword($pwd);
+
+                            $em->persist($user);
+                            $em->flush();
+
+                            $new_token = $jwt_auth->signup($email, $pwd, true);
+
+                            $data = [
+                                'status' => 'success',
+                                'message'=> 'Usuario actualizado',
+                                'user' => $user,
+                                'new_token'=> $new_token
+                            ];
+                        }
+
+                    }else{
+                        // actualizo los datos del usuario y devuelvo el usuario actualizado y su nuevo token
+                        $user_repo = $this->getDoctrine()->getRepository(User::class);
+                        $user = $user_repo->findOneBy([
+                            'id' => $identity->sub
+                        ]);
+
+                        $user->setName($email);
+                        $user->setSurname($email);
+                        $user->setEmail($email);
+
+                        // Cifrar la contrasena
+                        $pwd = hash('sha256', $password);
+                        $user->setPassword($pwd);
+
+                        $em->persist($user);
+                        $em->flush();
+
+                        $new_token = $jwt_auth->signup($email, $pwd, true);
+
+                        $data = [
+                            'status' => 'success',
+                            'message'=> 'Usuario actualizado',
+                            'user' => $user,
+                            'new_token'=> $new_token
+                        ];
+                    }
+                }else{
+                    $data = [
+                        'status' => 'error',
+                        'message'=> 'Error de validacion',
+                        'vaidator_error' => $vaidator_error
+                    ];
+                }
+
+
             }else{
                 $data = [
                     'status' => 'error',
