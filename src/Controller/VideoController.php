@@ -124,4 +124,40 @@ class VideoController extends AbstractController
         return $this->resjson($data);
         // return new JsonResponse($data);
     }
+
+    public function videos(Request $request, JwtAuth $jwt_auth){
+
+        // recoger el token
+        $token = $request->headers->get('Authorization');
+        
+        // comprobar si es correcto
+        $authCheck = $jwt_auth->checkToken($token);
+
+        // recoger datos por post
+        if($authCheck){
+            // recoger datos del usuario identificado
+            $identity = $jwt_auth->checkToken($token, true);
+            
+            // configurar el bundle de paginacion
+    
+            // recoger el prametro de la url
+    
+            // ....
+            
+            $data = [
+                'status' => 'success',
+                'code'   => 200,
+                'message'=> 'These are the videos'
+            ];
+
+        }else{
+            $data = [
+                'status' => 'error',
+                'code'   => 200,
+                'message'=> 'Token incorrect'
+            ];
+        }
+    
+        return $this->resjson($data);
+    }
 }
