@@ -309,7 +309,6 @@ class UserController extends AbstractController
                 }else{
                     $vaidator_error['password']='Send password confirmation';
                 }
-
                 //*--valido los datos------end
                 
                 // si pasa la validacion
