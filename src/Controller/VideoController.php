@@ -8,10 +8,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints\Email;
+use Knp\Component\Pager\PaginatorInterface;
+
 use App\Entity\User;
 use App\Entity\Video;
 use App\Services\JwtAuth;
-
 
 class VideoController extends AbstractController
 {
@@ -125,7 +126,7 @@ class VideoController extends AbstractController
         // return new JsonResponse($data);
     }
 
-    public function videos(Request $request, JwtAuth $jwt_auth){
+    public function videos(Request $request, JwtAuth $jwt_auth, PaginatorInterface $paginator){
 
         // recoger el token
         $token = $request->headers->get('Authorization');
@@ -137,17 +138,33 @@ class VideoController extends AbstractController
         if($authCheck){
             // recoger datos del usuario identificado
             $identity = $jwt_auth->checkToken($token, true);
+
+            // conseguir el entity manager
+            $em = $this->getDoctrine()->getManager();
             
             // configurar el bundle de paginacion
-    
+            $dql = "SELECT v FROM App\Entity\Video v WHERE v.user = {$identity->sub} ORDER BY v.id DESC";
+            $query = $em->createQuery($dql);
+
             // recoger el prametro de la url
-    
-            // ....
+            $page = $request->query->getInt('page', 1);
+            $items_per_page = 5;
+
+            // invocar la paginacion
+            $pagination = $paginator->paginate($query, $page, $items_per_page);
+            $total = $pagination->getTotalItemCount();
+
             
             $data = [
-                'status' => 'success',
-                'code'   => 200,
-                'message'=> 'These are the videos'
+                'status'         => 'success',
+                'code'           => 200,
+                'message'        => 'These are the videos',
+                'total'          => $total,
+                'page'           => $page,
+                'items_per_page' => $items_per_page,
+                'total_pages'    => ceil($total / $items_per_page),
+                'videos'         => $pagination,
+                'user_id'        => $identity->sub
             ];
 
         }else{
