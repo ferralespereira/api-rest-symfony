@@ -44,7 +44,7 @@ class VideoController extends AbstractController
         ]);
     }
 
-    public function create(Request $request, JwtAuth $jwt_auth){
+    public function create(Request $request, JwtAuth $jwt_auth, $id = null){
 
         // recoger el token
         $token = $request->headers->get('Authorization');
@@ -77,26 +77,62 @@ class VideoController extends AbstractController
                         'id' => $user_id
                     ]);
 
-                    // crear y guardar el objeto
-                    $video = new Video();
-                    $video->setUser($user);
-                    $video->setTitle($title);
-                    $video->setDescription($description);
-                    $video->setUrl($url);
-                    $video->setStatus('normal');
+                    if($id == null){
+                        // crear y guardar el objeto
+                        $video = new Video();
+                        $video->setUser($user);
+                        $video->setTitle($title);
+                        $video->setDescription($description);
+                        $video->setUrl($url);
+                        $video->setStatus('normal');
+    
+                        $video->setCreatedAt(new \Datetime('now'));
+                        $video->setUpdatedAt(new \Datetime('now'));
+    
+                        $em->persist($video);
+                        $em->flush();
+    
+                        $data = [
+                            'status' => 'success',
+                            'code'   => 200,
+                            'message'=> 'New video created',
+                            'video'  => $video
+                        ];
+                    }else{
+                        // update the video
 
-                    $video->setCreatedAt(new \Datetime('now'));
-                    $video->setUpdatedAt(new \Datetime('now'));
+                        $video =$this->getDoctrine()->getRepository(Video::class)->findOneBy([
+                            'id'   => $id,
+                            'user' => $identity->sub
+                        ]);
 
-                    $em->persist($video);
-                    $em->flush();
+                        if($video){
+                            
+                            $video->setTitle($title);
+                            $video->setDescription($description);
+                            $video->setUrl($url);
+    
+                            $video->setUpdatedAt(new \Datetime('now'));
 
-                    $data = [
-                        'status' => 'success',
-                        'code'   => 200,
-                        'message'=> 'New video created',
-                        'video'  => $video
-                    ];
+                            $em->persist($video);
+                            $em->flush();   
+
+                            $data = [
+                                'status' => 'success',
+                                'code'   => 200,
+                                'message'=> 'Video updated',
+                                'video'  => $video
+                            ];
+                        }else{
+                            $data = [
+                                'status' => 'error',
+                                'code'   => 200,
+                                'message'=> 'This video do not exist'
+                            ];
+
+                        }
+                        
+                    }
 
                 }else{
                     $data = [
