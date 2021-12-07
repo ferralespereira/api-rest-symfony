@@ -9,9 +9,9 @@ This is an Api Rest for a video web site enviroment. Development wiht Symfony ph
 # api-rest-symfony
 <VirtualHost 127.0.0.4:80>
     # ...
-    DocumentRoot /var/www/html/api-rest-symfony/public
+    DocumentRoot /var/www/html/angular-symfony-videos-project/api-rest-symfony/public
 
-    <Directory /var/www/html/api-rest-symfony/public>
+    <Directory /var/www/html/angular-symfony-videos-project/api-rest-symfony/public>
         AllowOverride None
 
         # Copy project/public .htaccess file content here-----ini

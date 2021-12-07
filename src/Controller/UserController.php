@@ -156,14 +156,14 @@ class UserController extends AbstractController
                     $data = [
                         'status' => 'success',
                         'code'   => 200,
-                        'message'=> 'El usuario se ha creado',
+                        'message'=> 'The user is created',
                         'user'   => $user
                     ];    
                 }else{
                     $data = [
                         'status' => 'error',
                         'code'   => 200,
-                        'message'=> 'El usuario existe'
+                        'message'=> 'This user already exists'
                     ];
                 }
 
@@ -179,7 +179,7 @@ class UserController extends AbstractController
             $data = [
                 'status' => 'error',
                 'code'   => 200,
-                'message'=> 'Envie los datos'
+                'message'=> 'Please, send the data'
             ];
         }
         
