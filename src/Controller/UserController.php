@@ -223,7 +223,7 @@ class UserController extends AbstractController
             }
         }else{
             $data = [
-                'status' => 'success',
+                'status' => 'error',
                 'code'   => 200,
                 'message'=> 'All data is missing.'
             ];
