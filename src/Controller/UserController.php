@@ -283,32 +283,6 @@ class UserController extends AbstractController
                 }else{
                     $vaidator_error['email']='write email';
                 }
-                
-                if(isset($params->password)){
-                    // Given password
-                    $password = $params->password;
-        
-                    // Validate password strength
-                    $uppercase = preg_match('@[A-Z]@', $password);
-                    $lowercase = preg_match('@[a-z]@', $password);
-                    $number    = preg_match('@[0-9]@', $password);
-                    $specialChars = preg_match('@[^\w]@', $password);
-    
-                    if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
-                        $vaidator_error['password']='Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
-                    }
-    
-                }else{
-                    $vaidator_error['password']='write password';
-                }
-
-                if(isset($params->password_confirmation)){
-                    if($params->password_confirmation != $params->password){
-                        $vaidator_error['password']='The password and password confirmation must be match';
-                    }
-                }else{
-                    $vaidator_error['password']='Send password confirmation';
-                }
                 //*--valido los datos------end
                 
                 // si pasa la validacion
@@ -335,24 +309,17 @@ class UserController extends AbstractController
                                 'id' => $identity->sub
                             ]);
 
-                            $user->setName($email);
-                            $user->setSurname($email);
+                            $user->setName($name);
+                            $user->setSurname($surname);
                             $user->setEmail($email);
-
-                            // Cifrar la contrasena
-                            $pwd = hash('sha256', $password);
-                            $user->setPassword($pwd);
 
                             $em->persist($user);
                             $em->flush();
 
-                            $new_token = $jwt_auth->signup($email, $pwd, true);
-
                             $data = [
                                 'status' => 'success',
                                 'message'=> 'Usuario actualizado',
-                                'user' => $user,
-                                'new_token'=> $new_token
+                                'user' => $user
                             ];
                         }
 
@@ -363,24 +330,17 @@ class UserController extends AbstractController
                             'id' => $identity->sub
                         ]);
 
-                        $user->setName($email);
-                        $user->setSurname($email);
+                        $user->setName($name);
+                        $user->setSurname($surname);
                         $user->setEmail($email);
-
-                        // Cifrar la contrasena
-                        $pwd = hash('sha256', $password);
-                        $user->setPassword($pwd);
 
                         $em->persist($user);
                         $em->flush();
 
-                        $new_token = $jwt_auth->signup($email, $pwd, true);
-
                         $data = [
                             'status' => 'success',
                             'message'=> 'Usuario actualizado',
-                            'user' => $user,
-                            'new_token'=> $new_token
+                            'user' => $user
                         ];
                     }
                 }else{
@@ -390,8 +350,6 @@ class UserController extends AbstractController
                         'vaidator_error' => $vaidator_error
                     ];
                 }
-
-
             }else{
                 $data = [
                     'status' => 'error',
