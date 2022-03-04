@@ -3,7 +3,7 @@ This is an Api Rest for a video web site enviroment. Development wiht Symfony ph
 
 ## Some Tips:
 ### To Run the proyect:
-* Install "apache-pack" to allow the framework runs in Apache: `composer require symfony/apache-pack`
+* Go to: `https://symfony.com/doc/current/deployment.html#symfony-deployment-basics`
 * Configure the apache file "/etc/apache2/sites-available" like this:
 ```   
 # api-rest-symfony
