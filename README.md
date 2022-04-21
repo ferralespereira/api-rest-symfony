@@ -5,7 +5,7 @@ This is an Api Rest for a video web site enviroment. Development wiht Symfony ph
 ### To Run the proyect in Production:
 * Go to: `https://symfony.com/doc/current/deployment.html#symfony-deployment-basics`
 * Configure the apache file "/etc/apache2/sites-available" like this:
-```   
+```apache   
 # api-rest-symfony
 <VirtualHost 127.0.0.4:80>
     ServerName yourdomain.com
