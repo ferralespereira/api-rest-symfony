@@ -40,6 +40,7 @@
 * To install new Symfony api: `composer create-project symfony/skeleton api-name "4.4.*"`
 * To make a controller: `php bin/console make:controller UserController`
 * To see my Symfony version: `php bin/console --version`
+* To know more details about symfony: `php bin/console about`
 * To remove any package: `composer remove package-name`
 * To install symfony by composer.json file: `composer update "symfony/*"`
 * To create Entities(this are like Data Base models): `php bin/console doctrine:mapping:import App\Entity annotation --path=src/Entity`
